@@ -1,0 +1,55 @@
+
+// fail prints the error message to stderr, then ends execution.
+func fail(err error) {
+	fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	os.Exit(1)
+}
+
+env command:
+		{
+			Name:  "env",
+			Usage: "print shell export statements",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "quiet, q",
+					Usage: "Suppress export statement",
+				},
+				cli.StringFlag{
+					Name:  "awsregion",
+					Usage: "AWS Region",
+				},
+			},
+			Action: func(c *cli.Context) {
+				var filename string
+
+				quiet := c.Bool("quiet")
+				awsRegion := c.String("awsregion")
+
+				// select the ExportFunction to use
+				exportFunc := ExportEnv
+				if quiet {
+					exportFunc = ExportQuiet
+				}
+
+				if 1 <= len(c.Args()) {
+					filename = c.Args().Get(0)
+				}
+
+				if "" == filename {
+					fail(fmt.Errorf("no secrets.ejson filename passed"))
+				}
+				privateKeyEnc, err := findPrivateKeyEnc(filename)
+				if err != nil {
+					fail(err)
+				}
+
+				kmsDecryptedPrivateKey, err := DecryptPrivateKeyWithKMS(privateKeyEnc, awsRegion)
+				if err != nil {
+					fail(err)
+				}
+
+				if err := exportSecrets(filename, "", kmsDecryptedPrivateKey, exportFunc); nil != err {
+					fail(err)
+				}
+			},
+		},
