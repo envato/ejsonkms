@@ -9,7 +9,8 @@ import (
 	"github.com/Shopify/ejson"
 )
 
-func keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
+// Keygen generates keys and prepares an EJSON file with them
+func Keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
 	pub, priv, err := ejson.GenerateKeypair()
 	if err != nil {
 		return "", "", "", err
@@ -23,7 +24,8 @@ func keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
 	return pub, priv, privKeyEnc, nil
 }
 
-func decrypt(ejsonFilePath string, awsRegion string) ([]byte, error) {
+// Decrypt decrypts an EJSON file
+func Decrypt(ejsonFilePath string, awsRegion string) ([]byte, error) {
 	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
 	if err != nil {
 		return nil, err

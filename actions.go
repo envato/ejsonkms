@@ -27,7 +27,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 	}
 	ejsonFilePath := args[0]
 
-	decrypted, err := decrypt(ejsonFilePath, awsRegion)
+	decrypted, err := Decrypt(ejsonFilePath, awsRegion)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 }
 
 func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile string) error {
-	pub, priv, privKeyEnc, err := keygen(kmsKeyID, awsRegion)
+	pub, priv, privKeyEnc, err := Keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
 	}
