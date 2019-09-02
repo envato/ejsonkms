@@ -86,7 +86,7 @@ func ExportSecrets(filename, privateKey string, exportFunc ExportFunction) error
 	return nil
 }
 
-// ReadSecrets reads the secrets for the passed filename and
+// readSecrets reads the secrets for the passed filename and
 // returns them as a map[string]interface{}.
 func readSecrets(filename, privateKey string) (map[string]interface{}, error) {
 	secrets := make(map[string]interface{})
