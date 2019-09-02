@@ -1,0 +1,20 @@
+version: "3"
+services:
+  awskms:
+    image: "nsmithuk/local-kms"
+    environment:
+      REGION: us-east-1
+    volumes:
+      - "./local_kms:/init"
+    expose:
+      - 8080
+  tests:
+    build: .
+    volumes:
+      - "./:/go/src/github.com/envato/ejsonkms"
+    command: ["go", "test"]
+    environment:
+      AWS_ACCESS_KEY_ID: '123'
+      AWS_SECRET_ACCESS_KEY: xyz
+    links:
+      - awskms

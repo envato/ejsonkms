@@ -2,16 +2,18 @@ package main
 
 import (
 	"encoding/base64"
+	"flag"
 	"log"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 )
 
+var fakeKmsEndpoint = "http://awskms:8080"
+
 func decryptPrivateKeyWithKMS(privateKeyEnc string, awsRegion string) (key string, err error) {
-	awsSession := session.Must(session.NewSession())
-	awsSession.Config.WithRegion(awsRegion)
-	kmsSvc := kms.New(awsSession)
+	kmsSvc := newKmsClient(awsRegion)
 
 	encryptedValue, err := base64.StdEncoding.DecodeString(privateKeyEnc)
 
@@ -26,9 +28,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc string, awsRegion string) (key strin
 }
 
 func encryptPrivateKeyWithKMS(privateKey string, kmsKeyID string, awsRegion string) (key string, err error) {
-	awsSession := session.Must(session.NewSession())
-	awsSession.Config.WithRegion(awsRegion)
-	kmsSvc := kms.New(awsSession)
+	kmsSvc := newKmsClient(awsRegion)
 	params := &kms.EncryptInput{
 		KeyId:     &kmsKeyID,
 		Plaintext: []byte(privateKey),
@@ -40,4 +40,13 @@ func encryptPrivateKeyWithKMS(privateKey string, kmsKeyID string, awsRegion stri
 
 	encodedPrivKey := base64.StdEncoding.EncodeToString(resp.CiphertextBlob)
 	return encodedPrivKey, nil
+}
+
+func newKmsClient(awsRegion string) *kms.KMS {
+	awsSession := session.Must(session.NewSession())
+	awsSession.Config.WithRegion(awsRegion)
+	if flag.Lookup("test.v") != nil { // is there a better way to do this?
+		return kms.New(awsSession, aws.NewConfig().WithEndpoint(fakeKmsEndpoint))
+	}
+	return kms.New(awsSession)
 }

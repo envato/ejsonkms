@@ -30,17 +30,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 	}
 	ejsonFilePath := args[0]
 
-	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
-	if err != nil {
-		return err
-	}
-
-	kmsDecryptedPrivateKey, err := decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion)
-	if err != nil {
-		return err
-	}
-
-	decrypted, err := ejson.DecryptFile(ejsonFilePath, "", kmsDecryptedPrivateKey)
+	decrypted, err := decrypt(ejsonFilePath, awsRegion)
 	if err != nil {
 		return err
 	}
@@ -59,12 +49,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 }
 
 func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile string) error {
-	pub, priv, err := ejson.GenerateKeypair()
-	if err != nil {
-		return err
-	}
-
-	privKeyEnc, err := encryptPrivateKeyWithKMS(priv, kmsKeyID, awsRegion)
+	pub, priv, privKeyEnc, err := keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
 	}
