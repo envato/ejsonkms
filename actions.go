@@ -69,3 +69,21 @@ func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile stri
 	}
 	return nil
 }
+
+func envAction(ejsonFilePath string, quiet bool, awsRegion string) error {
+	exportFunc := ExportEnv
+	if quiet {
+		exportFunc = ExportQuiet
+	}
+	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
+	if err != nil {
+		return err
+	}
+
+	kmsDecryptedPrivateKey, err := decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion)
+	if err != nil {
+		return err
+	}
+
+	return ExportSecrets(ejsonFilePath, kmsDecryptedPrivateKey, exportFunc)
+}

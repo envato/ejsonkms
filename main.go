@@ -10,6 +10,12 @@ import (
 // version information. This will be overridden by the ldflags
 var version = "dev"
 
+// fail prints the error message to stderr, then ends execution.
+func fail(err error) {
+	fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	os.Exit(1)
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Usage = "manage encrypted secrets using EJSON & AWS KMS"
@@ -68,6 +74,38 @@ func main() {
 				if err := keygenAction(c.Args(), c.String("kms-key-id"), c.String("aws-region"), c.String("o")); err != nil {
 					fmt.Fprintln(os.Stderr, "Key generation failed:", err)
 					os.Exit(1)
+				}
+			},
+		},
+		{
+			Name:  "env",
+			Usage: "print shell export statements",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "quiet, q",
+					Usage: "Suppress export statement",
+				},
+				cli.StringFlag{
+					Name:  "aws-region",
+					Usage: "AWS Region",
+				},
+			},
+			Action: func(c *cli.Context) {
+				var filename string
+
+				quiet := c.Bool("quiet")
+				awsRegion := c.String("aws-region")
+
+				if 1 <= len(c.Args()) {
+					filename = c.Args().Get(0)
+				}
+
+				if "" == filename {
+					fail(fmt.Errorf("no secrets.ejson filename passed"))
+				}
+
+				if err := envAction(filename, quiet, awsRegion); nil != err {
+					fail(err)
 				}
 			},
 		},
