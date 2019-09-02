@@ -1,6 +1,13 @@
 package main
 
-import "github.com/Shopify/ejson"
+import (
+	"encoding/json"
+	"errors"
+	"io/ioutil"
+	"os"
+
+	"github.com/Shopify/ejson"
+)
 
 func keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
 	pub, priv, err := ejson.GenerateKeypair()
@@ -33,4 +40,37 @@ func decrypt(ejsonFilePath string, awsRegion string) ([]byte, error) {
 	}
 
 	return decrypted, nil
+}
+
+func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
+	var (
+		obj map[string]interface{}
+		ks  string
+	)
+
+	file, err := os.Open(ejsonFilePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	err = json.Unmarshal(data, &obj)
+	if err != nil {
+		return "", err
+	}
+
+	k, ok := obj["_private_key_enc"]
+	if !ok {
+		return "", errors.New("Missing _private_key_enc field")
+	}
+	ks, ok = k.(string)
+	if !ok {
+		return "", errors.New("Couldn't cast _private_key_enc to string")
+	}
+	return ks, nil
 }

@@ -1,10 +1,7 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/Shopify/ejson"
@@ -71,37 +68,4 @@ func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile stri
 		return err
 	}
 	return nil
-}
-
-func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
-	var (
-		obj map[string]interface{}
-		ks  string
-	)
-
-	file, err := os.Open(ejsonFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		return "", err
-	}
-
-	err = json.Unmarshal(data, &obj)
-	if err != nil {
-		return "", err
-	}
-
-	k, ok := obj["_private_key_enc"]
-	if !ok {
-		return "", errors.New("Missing _private_key_enc field")
-	}
-	ks, ok = k.(string)
-	if !ok {
-		return "", errors.New("Couldn't cast _private_key_enc to string")
-	}
-	return ks, nil
 }
