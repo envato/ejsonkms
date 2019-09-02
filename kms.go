@@ -4,13 +4,12 @@ import (
 	"encoding/base64"
 	"flag"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 )
-
-var fakeKmsEndpoint = "http://awskms:8080"
 
 func decryptPrivateKeyWithKMS(privateKeyEnc string, awsRegion string) (key string, err error) {
 	kmsSvc := newKmsClient(awsRegion)
@@ -46,6 +45,10 @@ func newKmsClient(awsRegion string) *kms.KMS {
 	awsSession := session.Must(session.NewSession())
 	awsSession.Config.WithRegion(awsRegion)
 	if flag.Lookup("test.v") != nil { // is there a better way to do this?
+		fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL")
+		if len(fakeKmsEndpoint) == 0 {
+			fakeKmsEndpoint = "http://localhost:8080"
+		}
 		return kms.New(awsSession, aws.NewConfig().WithEndpoint(fakeKmsEndpoint))
 	}
 	return kms.New(awsSession)
