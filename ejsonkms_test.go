@@ -21,9 +21,18 @@ func TestKeygen(t *testing.T) {
 
 func TestDecrypt(t *testing.T) {
 	Convey("Decrypt", t, func() {
-		So(err, ShouldBeNil)
-		json := string(decrypted[:])
-		So(json, ShouldContainSubstring, "\"my_secret\": \"secret123\"")
 		decrypted, err := Decrypt("testdata/test.ejson", "us-east-1")
+		Convey("should return decrypted values", func() {
+			So(err, ShouldBeNil)
+			json := string(decrypted[:])
+			So(json, ShouldContainSubstring, "\"my_secret\": \"secret123\"")
+		})
+	})
+	Convey("Decrypt with no private key", t, func() {
+		_, err := Decrypt("testdata/test_no_private_key.ejson", "us-east-1")
+		Convey("should fail", func() {
+			So(err, ShouldNotBeNil)
+			So(err.Error(), ShouldContainSubstring, "Missing _private_key_enc")
+		})
 	})
 }
