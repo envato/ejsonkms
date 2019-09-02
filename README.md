@@ -48,3 +48,5 @@ $ eval $exports
 $ echo my_secret
 secret123
 ```
+
+Note that only secrets under the "environment" key will be exported using the `env` command.
