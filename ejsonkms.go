@@ -44,10 +44,13 @@ func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
 	return decrypted, nil
 }
 
+type ejsonKmsFile struct {
+	EncryptedPrivateKey string `json:"_private_key_enc"`
+}
+
 func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 	var (
-		obj map[string]interface{}
-		ks  string
+		obj ejsonKmsFile
 	)
 
 	file, err := os.Open(ejsonFilePath)
@@ -66,13 +69,9 @@ func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 		return "", err
 	}
 
-	k, ok := obj["_private_key_enc"]
-	if !ok {
+	if len(obj.EncryptedPrivateKey) == 0 {
 		return "", errors.New("Missing _private_key_enc field")
 	}
-	ks, ok = k.(string)
-	if !ok {
-		return "", errors.New("Couldn't cast _private_key_enc to string")
-	}
-	return ks, nil
+
+	return obj.EncryptedPrivateKey, nil
 }
