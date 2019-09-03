@@ -25,7 +25,7 @@ func TestDecrypt(t *testing.T) {
 		Convey("should return decrypted values", func() {
 			So(err, ShouldBeNil)
 			json := string(decrypted[:])
-			So(json, ShouldContainSubstring, "\"my_secret\": \"secret123\"")
+			So(json, ShouldContainSubstring, `"my_secret": "secret123"`)
 		})
 	})
 	Convey("Decrypt with no private key", t, func() {
