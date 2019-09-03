@@ -5,6 +5,18 @@ Service](https://aws.amazon.com/kms/) to simplify deployments on AWS. The EJSON 
 KMS and stored inside the EJSON file as `_private_key_enc`. Access to decrypt secrets can be controlled with IAM
 permissions on the KMS key.
 
+## Install
+
+Precompiled binaries can be downloaded from [releases](https://github.com/envato/ejsonkms/releases).
+
+### Go
+
+```
+go get -u github.com/envato/ejsonkms
+```
+
+This will install the binary to `$GOBIN/ejsonkms`.
+
 ## Usage
 
 Generating an EJSON file:
