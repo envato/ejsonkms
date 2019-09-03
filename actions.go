@@ -51,7 +51,7 @@ func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile stri
 		return err
 	}
 
-	fmt.Printf("Private Key: %s\n", priv)
+	fmt.Println("Private Key:", priv)
 	target := os.Stdout
 	if outFile != "" {
 		target, err = os.Create(outFile)
@@ -60,7 +60,7 @@ func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile stri
 		}
 		defer func() { _ = target.Close() }()
 	} else {
-		fmt.Printf("EJSON File:\n")
+		fmt.Println("EJSON File:")
 	}
 
 	_, err = fmt.Fprintf(target, "{\n  \"_public_key\": \"%s\",\n  \"_private_key_enc\": \"%s\"\n}", pub, privKeyEnc)
