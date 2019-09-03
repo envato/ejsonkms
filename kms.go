@@ -21,7 +21,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 	}
 	resp, err := kmsSvc.Decrypt(params)
 	if err != nil {
-		log.Fatalf("Unable to decrypt parameter: %v", err)
+		log.Fatalf("unable to decrypt parameter: %v", err)
 	}
 	return string(resp.Plaintext), nil
 }
@@ -34,7 +34,7 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 	}
 	resp, err := kmsSvc.Encrypt(params)
 	if err != nil {
-		log.Fatalf("Unable to encrypt parameter: %v", err)
+		log.Fatalf("unable to encrypt parameter: %v", err)
 	}
 
 	encodedPrivKey := base64.StdEncoding.EncodeToString(resp.CiphertextBlob)
