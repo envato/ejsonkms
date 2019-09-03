@@ -80,7 +80,7 @@ func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 	}
 
 	if len(ejsonKmsKeys.PrivateKeyEnc) == 0 {
-		return "", errors.New("Missing _private_key_enc field")
+		return "", errors.New("missing _private_key_enc field")
 	}
 
 	return ejsonKmsKeys.PrivateKeyEnc, nil
