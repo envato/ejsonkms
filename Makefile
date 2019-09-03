@@ -1,5 +1,4 @@
 NAME=ejsonkms
-PACKAGE=github.com/envato/ejsonkms
 VERSION=$(shell cat VERSION)
 GOFILES=$(shell find . -type f -name '*.go')
 
