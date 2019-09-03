@@ -2,8 +2,7 @@ package main
 
 import (
 	"encoding/base64"
-	"flag"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -21,7 +20,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 	}
 	resp, err := kmsSvc.Decrypt(params)
 	if err != nil {
-		log.Fatalf("unable to decrypt parameter: %v", err)
+		return "", fmt.Errorf("unable to decrypt parameter: %v", err)
 	}
 	return string(resp.Plaintext), nil
 }
@@ -34,7 +33,7 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 	}
 	resp, err := kmsSvc.Encrypt(params)
 	if err != nil {
-		log.Fatalf("unable to encrypt parameter: %v", err)
+		return "", fmt.Errorf("unable to encrypt parameter: %v", err)
 	}
 
 	encodedPrivKey := base64.StdEncoding.EncodeToString(resp.CiphertextBlob)
