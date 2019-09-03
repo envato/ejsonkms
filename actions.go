@@ -38,7 +38,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 		if err != nil {
 			return err
 		}
-		defer func() { _ = target.Close() }()
+		defer target.Close()
 	}
 
 	_, err = target.Write(decrypted)
