@@ -5,7 +5,7 @@ services:
     environment:
       REGION: us-east-1
     volumes:
-      - "./local_kms:/init"
+      - "./local_kms/seed.yaml:/init/seed.yaml"
     expose:
       - 8080
   tests:
