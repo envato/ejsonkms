@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
+	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 )
 
 func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
@@ -40,7 +41,7 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 	return encodedPrivKey, nil
 }
 
-func newKmsClient(awsRegion string) *kms.KMS {
+func newKmsClient(awsRegion string) kmsiface.KMSAPI {
 	awsSession := session.Must(session.NewSession())
 	awsSession.Config.WithRegion(awsRegion)
 	fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL")
