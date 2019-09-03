@@ -46,13 +46,24 @@ func decryptAction(args []string, awsRegion, outFile string) error {
 	return err
 }
 
+// ejsonKmsFile - an ejson file
+type ejsonKmsFile struct {
+	PublicKey     string `json:"_public_key"`
+	PrivateKeyEnc string `json:"_private_key_enc"`
+}
+
 func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 	ejsonKmsKeys, err := Keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
 	}
 
-	ejsonFile, err := json.MarshalIndent(ejsonKmsKeys, "", "  ")
+	ejsonKmsFile := ejsonKmsFile{
+		PublicKey:     ejsonKmsKeys.PublicKey,
+		PrivateKeyEnc: ejsonKmsKeys.PrivateKeyEnc,
+	}
+
+	ejsonFile, err := json.MarshalIndent(ejsonKmsFile, "", "  ")
 	if err != nil {
 		return err
 	}
