@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -46,12 +47,14 @@ func decryptAction(args []string, awsRegion, outFile string) error {
 }
 
 func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
-	pub, priv, privKeyEnc, err := Keygen(kmsKeyID, awsRegion)
+	ejsonKmsKeys, err := Keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Private Key:", priv)
+	ejsonFile, err := json.Marshal(ejsonKmsKeys)
+
+	fmt.Println("Private Key:", ejsonKmsKeys.PrivateKey)
 	target := os.Stdout
 	if outFile != "" {
 		target, err = os.Create(outFile)
@@ -63,7 +66,7 @@ func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 		fmt.Println("EJSON File:")
 	}
 
-	_, err = fmt.Fprintf(target, "{\n  \"_public_key\": \"%s\",\n  \"_private_key_enc\": \"%s\"\n}", pub, privKeyEnc)
+	_, err = target.Write(ejsonFile)
 	if err != nil {
 		return err
 	}

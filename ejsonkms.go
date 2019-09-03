@@ -9,19 +9,33 @@ import (
 	"github.com/Shopify/ejson"
 )
 
+// EjsonKmsKeys - keys used in an EjsonKms file
+type EjsonKmsKeys struct {
+	PublicKey     string `json:"_public_key"`
+	PrivateKeyEnc string `json:"_private_key_enc"`
+	PrivateKey    string
+}
+
 // Keygen generates keys and prepares an EJSON file with them
-func Keygen(kmsKeyID, awsRegion string) (string, string, string, error) {
+func Keygen(kmsKeyID, awsRegion string) (EjsonKmsKeys, error) {
+	var ejsonKmsKeys EjsonKmsKeys
 	pub, priv, err := ejson.GenerateKeypair()
 	if err != nil {
-		return "", "", "", err
+		return ejsonKmsKeys, err
 	}
 
 	privKeyEnc, err := encryptPrivateKeyWithKMS(priv, kmsKeyID, awsRegion)
 	if err != nil {
-		return "", "", "", err
+		return ejsonKmsKeys, err
 	}
 
-	return pub, priv, privKeyEnc, nil
+	ejsonKmsKeys = EjsonKmsKeys{
+		PublicKey:     pub,
+		PrivateKeyEnc: privKeyEnc,
+		PrivateKey:    priv,
+	}
+
+	return ejsonKmsKeys, nil
 }
 
 // Decrypt decrypts an EJSON file
@@ -44,13 +58,9 @@ func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
 	return decrypted, nil
 }
 
-type ejsonKmsFile struct {
-	EncryptedPrivateKey string `json:"_private_key_enc"`
-}
-
 func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 	var (
-		obj ejsonKmsFile
+		ejsonKmsKeys EjsonKmsKeys
 	)
 
 	file, err := os.Open(ejsonFilePath)
@@ -64,14 +74,14 @@ func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 		return "", err
 	}
 
-	err = json.Unmarshal(data, &obj)
+	err = json.Unmarshal(data, &ejsonKmsKeys)
 	if err != nil {
 		return "", err
 	}
 
-	if len(obj.EncryptedPrivateKey) == 0 {
+	if len(ejsonKmsKeys.PrivateKeyEnc) == 0 {
 		return "", errors.New("Missing _private_key_enc field")
 	}
 
-	return obj.EncryptedPrivateKey, nil
+	return ejsonKmsKeys.PrivateKeyEnc, nil
 }
