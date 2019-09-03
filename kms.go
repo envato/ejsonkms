@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 )
 
-func decryptPrivateKeyWithKMS(privateKeyEnc string, awsRegion string) (key string, err error) {
+func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
 	kmsSvc := newKmsClient(awsRegion)
 
 	encryptedValue, err := base64.StdEncoding.DecodeString(privateKeyEnc)
@@ -26,7 +26,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc string, awsRegion string) (key strin
 	return string(resp.Plaintext), nil
 }
 
-func encryptPrivateKeyWithKMS(privateKey string, kmsKeyID string, awsRegion string) (key string, err error) {
+func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key string, err error) {
 	kmsSvc := newKmsClient(awsRegion)
 	params := &kms.EncryptInput{
 		KeyId:     &kmsKeyID,

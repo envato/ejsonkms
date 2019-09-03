@@ -21,7 +21,7 @@ func encryptAction(args []string) error {
 	return nil
 }
 
-func decryptAction(args []string, awsRegion string, outFile string) error {
+func decryptAction(args []string, awsRegion, outFile string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("exactly one file path must be given")
 	}
@@ -45,7 +45,7 @@ func decryptAction(args []string, awsRegion string, outFile string) error {
 	return err
 }
 
-func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile string) error {
+func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 	pub, priv, privKeyEnc, err := Keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func keygenAction(args []string, kmsKeyID string, awsRegion string, outFile stri
 	return nil
 }
 
-func envAction(ejsonFilePath string, quiet bool, awsRegion string) error {
+func envAction(ejsonFilePath, awsRegion string, quiet bool) error {
 	exportFunc := ExportEnv
 	if quiet {
 		exportFunc = ExportQuiet

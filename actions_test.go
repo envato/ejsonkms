@@ -18,7 +18,7 @@ func TestEnv(t *testing.T) {
 	}()
 
 	Convey("Env", t, func() {
-		err := envAction("testdata/test.ejson", false, "us-east-1")
+		err := envAction("testdata/test.ejson", "us-east-1", false)
 
 		Convey("should return decrypted values as shell exports", func() {
 			So(err, ShouldBeNil)
@@ -28,7 +28,7 @@ func TestEnv(t *testing.T) {
 	})
 
 	Convey("Env with no private key", t, func() {
-		err := envAction("testdata/test_no_private_key.ejson", false, "us-east-1")
+		err := envAction("testdata/test_no_private_key.ejson", "us-east-1", false)
 
 		Convey("should fail", func() {
 			So(err, ShouldNotBeNil)

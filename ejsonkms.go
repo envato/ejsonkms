@@ -10,7 +10,7 @@ import (
 )
 
 // Keygen generates keys and prepares an EJSON file with them
-func Keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
+func Keygen(kmsKeyID, awsRegion string) (string, string, string, error) {
 	pub, priv, err := ejson.GenerateKeypair()
 	if err != nil {
 		return "", "", "", err
@@ -25,7 +25,7 @@ func Keygen(kmsKeyID string, awsRegion string) (string, string, string, error) {
 }
 
 // Decrypt decrypts an EJSON file
-func Decrypt(ejsonFilePath string, awsRegion string) ([]byte, error) {
+func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
 	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
 	if err != nil {
 		return nil, err

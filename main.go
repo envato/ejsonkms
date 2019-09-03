@@ -104,7 +104,7 @@ func main() {
 					fail(fmt.Errorf("no secrets.ejson filename passed"))
 				}
 
-				if err := envAction(filename, quiet, awsRegion); nil != err {
+				if err := envAction(filename, awsRegion, quiet); nil != err {
 					fail(err)
 				}
 			},
