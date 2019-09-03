@@ -52,7 +52,10 @@ func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 		return err
 	}
 
-	ejsonFile, err := json.Marshal(ejsonKmsKeys)
+	ejsonFile, err := json.MarshalIndent(ejsonKmsKeys, "", "  ")
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("Private Key:", ejsonKmsKeys.PrivateKey)
 	target := os.Stdout
