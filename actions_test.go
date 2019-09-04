@@ -1,29 +1,21 @@
 package main
 
 import (
-	"bytes"
-	"os"
 	"testing"
 
+	"github.com/kami-zh/go-capturer"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestEnv(t *testing.T) {
-	outputBuffer := new(bytes.Buffer)
-	output = outputBuffer
-
-	// ensure that output returns to os.Stdout
-	defer func() {
-		output = os.Stdout
-	}()
-
 	Convey("Env", t, func() {
-		err := envAction("testdata/test.ejson", "us-east-1", false)
+		out := capturer.CaptureOutput(func() {
+			err := envAction("testdata/test.ejson", "us-east-1", false)
+			So(err, ShouldBeNil)
+		})
 
 		Convey("should return decrypted values as shell exports", func() {
-			So(err, ShouldBeNil)
-			actualOutput := outputBuffer.String()
-			So(actualOutput, ShouldContainSubstring, "export my_secret=secret123")
+			So(out, ShouldContainSubstring, "export my_secret=secret123")
 		})
 	})
 
@@ -32,7 +24,7 @@ func TestEnv(t *testing.T) {
 
 		Convey("should fail", func() {
 			So(err, ShouldNotBeNil)
-			So(err.Error(), ShouldContainSubstring, "Missing _private_key_enc")
+			So(err.Error(), ShouldContainSubstring, "missing _private_key_enc")
 		})
 	})
 }
