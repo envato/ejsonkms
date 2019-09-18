@@ -1,7 +1,11 @@
 github.com/Shopify/ejson v0.0.0-20170822170800-ce9261f21575 h1:Fzg3418Z1/GsFE5ds+V2+bw2vxRnrbqGMQJZMQqnyTY=
 github.com/Shopify/ejson v0.0.0-20170822170800-ce9261f21575/go.mod h1:J8cw5GOA0l/aMOPp+uDfwNYVbeqIaBhzRkv1+76UCvk=
+github.com/Shopify/ejson v1.2.1 h1:Dx0Ipn0mUgrZlzIa5oIUrH0rdSmBOyod/UJmQQK1KHo=
+github.com/Shopify/ejson v1.2.1/go.mod h1:J8cw5GOA0l/aMOPp+uDfwNYVbeqIaBhzRkv1+76UCvk=
 github.com/Shopify/ejson2env v1.1.1-0.20190903150709-8b3318fa77da h1:nmnaRYB3AkMRHqlpkVDDffwcgjrTV1vsVmy9aoOWPhQ=
 github.com/Shopify/ejson2env v1.1.1-0.20190903150709-8b3318fa77da/go.mod h1:tap/Rfr23yENmnL4x4bd040zWzPMfz5ZcJ4OIoqF0ko=
+github.com/Shopify/ejson2env v2.0.0+incompatible h1:9Iju0qx1Qi9sr60jqQP3gYKPf7LOPITeUROXNPuptFQ=
+github.com/Shopify/ejson2env v2.0.0+incompatible/go.mod h1:tap/Rfr23yENmnL4x4bd040zWzPMfz5ZcJ4OIoqF0ko=
 github.com/aws/aws-sdk-go v1.23.12 h1:2UnxgNO6Y5J1OrkXS8XNp0UatDxD1bWHiDT62RDPggI=
 github.com/aws/aws-sdk-go v1.23.12/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
