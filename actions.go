@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Shopify/ejson"
+	"github.com/Shopify/ejson2env"
 )
 
 func encryptAction(args []string) error {
@@ -88,9 +89,9 @@ func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 }
 
 func envAction(ejsonFilePath, awsRegion string, quiet bool) error {
-	exportFunc := ExportEnv
+	exportFunc := ejson2env.ExportEnv
 	if quiet {
-		exportFunc = ExportQuiet
+		exportFunc = ejson2env.ExportQuiet
 	}
 	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
 	if err != nil {
@@ -102,5 +103,12 @@ func envAction(ejsonFilePath, awsRegion string, quiet bool) error {
 		return err
 	}
 
-	return ExportSecrets(ejsonFilePath, kmsDecryptedPrivateKey, exportFunc)
+	envValues, err := ejson2env.ReadAndExtractEnv(ejsonFilePath, "", kmsDecryptedPrivateKey)
+
+	if nil != err && !ejson2env.IsEnvError(err) {
+		return fmt.Errorf("could not load environment from file: %s", err)
+	}
+
+	exportFunc(os.Stdout, envValues)
+	return nil
 }
