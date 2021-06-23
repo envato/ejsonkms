@@ -6,7 +6,7 @@ GOFILES=$(shell find . -type f -name '*.go')
 
 default: all
 all: binaries
-binaries: build/bin/linux-amd64 build/bin/darwin-amd64
+binaries: build/bin/linux-amd64 build/bin/darwin-amd64 build/bin/darwin-arm64
 
 build/bin/linux-amd64: $(GOFILES)
 	mkdir -p "$(@D)"
@@ -16,6 +16,11 @@ build/bin/linux-amd64: $(GOFILES)
 
 build/bin/darwin-amd64: $(GOFILES)
 	GOOS=darwin GOARCH=amd64 go build \
+	-ldflags '-s -w -X main.version="$(VERSION)"' \
+	-o "$@"
+
+build/bin/darwin-arm64: $(GOFILES)
+	GOOS=darwin GOARCH=arm64 go build \
 	-ldflags '-s -w -X main.version="$(VERSION)"' \
 	-o "$@"
 
