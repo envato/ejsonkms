@@ -7,7 +7,7 @@ services:
       KMS_REGION: us-east-1
       KMS_ACCOUNT_ID: 111122223333
     volumes:
-      - "./local_kms/seed.yaml:/init/seed.yaml"
+      - "./local_kms/:/init/"
     expose:
       - 8080
   tests:
