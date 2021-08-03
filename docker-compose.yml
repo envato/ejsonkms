@@ -4,6 +4,8 @@ services:
     image: "nsmithuk/local-kms"
     environment:
       REGION: us-east-1
+      KMS_REGION: us-east-1
+      KMS_ACCOUNT_ID: 111122223333
     volumes:
       - "./local_kms/seed.yaml:/init/seed.yaml"
     expose:
@@ -16,6 +18,7 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: '123'
       AWS_SECRET_ACCESS_KEY: xyz
+      AWS_REGION: us-east-1
       FAKE_AWSKMS_URL: http://awskms:8080
     links:
       - awskms
