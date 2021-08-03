@@ -1,4 +1,4 @@
-FROM golang:1.12-alpine
+FROM golang:1.16-alpine
 ENV GO111MODULE=on
 WORKDIR /go/src/github.com/envato/ejsonkms
 COPY . .
