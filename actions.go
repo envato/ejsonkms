@@ -1,4 +1,4 @@
-package main
+package ejsonkms
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/Shopify/ejson2env"
 )
 
-func encryptAction(args []string) error {
+func EncryptAction(args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("at least one file path must be given")
 	}
@@ -23,7 +23,7 @@ func encryptAction(args []string) error {
 	return nil
 }
 
-func decryptAction(args []string, awsRegion, outFile string) error {
+func DecryptAction(args []string, awsRegion, outFile string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("exactly one file path must be given")
 	}
@@ -53,7 +53,7 @@ type ejsonKmsFile struct {
 	PrivateKeyEnc string `json:"_private_key_enc"`
 }
 
-func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
+func KeygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 	ejsonKmsKeys, err := Keygen(kmsKeyID, awsRegion)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func keygenAction(args []string, kmsKeyID, awsRegion, outFile string) error {
 	return nil
 }
 
-func envAction(ejsonFilePath, awsRegion string, quiet bool) error {
+func EnvAction(ejsonFilePath, awsRegion string, quiet bool) error {
 	exportFunc := ejson2env.ExportEnv
 	if quiet {
 		exportFunc = ejson2env.ExportQuiet

@@ -1,4 +1,4 @@
-package main
+package ejsonkms
 
 import (
 	"encoding/base64"
