@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/envato/ejsonkms"
 	"github.com/urfave/cli"
 )
 
@@ -27,7 +28,7 @@ func main() {
 			Name:  "encrypt",
 			Usage: "(re-)encrypt one or more EJSON files",
 			Action: func(c *cli.Context) {
-				if err := encryptAction(c.Args()); err != nil {
+				if err := ejsonkms.EncryptAction(c.Args()); err != nil {
 					fmt.Fprintln(os.Stderr, "Encryption failed:", err)
 					os.Exit(1)
 				}
@@ -47,7 +48,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) {
-				if err := decryptAction(c.Args(), c.String("aws-region"), c.String("o")); err != nil {
+				if err := ejsonkms.DecryptAction(c.Args(), c.String("aws-region"), c.String("o")); err != nil {
 					fmt.Fprintln(os.Stderr, "Decryption failed:", err)
 					os.Exit(1)
 				}
@@ -71,7 +72,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) {
-				if err := keygenAction(c.Args(), c.String("kms-key-id"), c.String("aws-region"), c.String("o")); err != nil {
+				if err := ejsonkms.KeygenAction(c.Args(), c.String("kms-key-id"), c.String("aws-region"), c.String("o")); err != nil {
 					fmt.Fprintln(os.Stderr, "Key generation failed:", err)
 					os.Exit(1)
 				}
@@ -104,7 +105,7 @@ func main() {
 					fail(fmt.Errorf("no secrets.ejson filename passed"))
 				}
 
-				if err := envAction(filename, awsRegion, quiet); nil != err {
+				if err := ejsonkms.EnvAction(filename, awsRegion, quiet); nil != err {
 					fail(err)
 				}
 			},

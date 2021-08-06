@@ -1,4 +1,4 @@
-package main
+package ejsonkms
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ import (
 func TestEnv(t *testing.T) {
 	Convey("Env", t, func() {
 		out := capturer.CaptureOutput(func() {
-			err := envAction("testdata/test.ejson", "us-east-1", false)
+			err := EnvAction("testdata/test.ejson", "us-east-1", false)
 			So(err, ShouldBeNil)
 		})
 
@@ -20,7 +20,7 @@ func TestEnv(t *testing.T) {
 	})
 
 	Convey("Env with no private key", t, func() {
-		err := envAction("testdata/test_no_private_key.ejson", "us-east-1", false)
+		err := EnvAction("testdata/test_no_private_key.ejson", "us-east-1", false)
 
 		Convey("should fail", func() {
 			So(err, ShouldNotBeNil)
