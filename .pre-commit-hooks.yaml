@@ -1,3 +1,5 @@
+# Defines supported pre-commit hooks for this project. 
+
 - id: run-ejsonkms-encrypt
   name: run-ejsonkms-encrypt
   description: Run ejsonkms encrypt on all ejson files in your repository.

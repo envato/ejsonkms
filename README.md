@@ -62,3 +62,16 @@ secret123
 ```
 
 Note that only secrets under the "environment" key will be exported using the `env` command.
+
+## pre-commit hook
+
+A [pre-commit](https://pre-commit.com/) hook is also supported to automatically run `ejsonkms encrypt` on all `.ejson` files in a repository.
+
+To use, add the following to a `.pre-commit-conifg.yaml` file in your repository:
+
+```yaml
+repos:
+  - repo: https://github.com/envato/ejsonkms
+    hooks:
+      - id: run-ejsonkms-encrypt
+```
