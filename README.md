@@ -12,7 +12,7 @@ Precompiled binaries can be downloaded from [releases](https://github.com/envato
 ### Go
 
 ```
-go get -u github.com/envato/ejsonkms
+GO111MODULE=on go get -u github.com/envato/ejsonkms
 ```
 
 This will install the binary to `$GOBIN/ejsonkms`.
