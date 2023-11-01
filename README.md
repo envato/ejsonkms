@@ -13,7 +13,9 @@ Precompiled binaries can be downloaded from [releases](https://github.com/envato
 
 ```
 go install github.com/envato/ejsonkms@latest
-sudo  ~/go/bin/ejsonkms /usr/local/bin/
+
+# Move binary to somewhere on $PATH. E.g.,
+sudo cp "$GOBIN/ejsonkms" /usr/local/bin/
 
 ejsonkms
 ```
