@@ -21,5 +21,7 @@ jobs:
           go-version-file: go.mod
           check-latest: true
       - uses: goreleaser/goreleaser-action@v5
+        with:
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
