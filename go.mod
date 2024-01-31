@@ -18,6 +18,6 @@ require (
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
 	github.com/taskcluster/shell v0.0.0-20161108133149-4039a2cd6f88 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 )
