@@ -2,7 +2,7 @@ module github.com/envato/ejsonkms
 
 go 1.24.0
 
-toolchain go1.24.5
+toolchain go1.24.7
 
 require (
 	github.com/Shopify/ejson v1.5.4
