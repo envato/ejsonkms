@@ -7,7 +7,14 @@ GOFILES=$(shell find . -type f -name '*.go')
 
 default: all
 all: binaries
-binaries: build/bin/linux-amd64  build/bin/linux-arm64 build/bin/darwin-amd64 build/bin/darwin-arm64
+binaries: build/bin/linux-ppc64le build/bin/linux-amd64 build/bin/linux-arm64 build/bin/darwin-amd64 build/bin/darwin-arm64
+
+build/bin/linux-ppc64le: $(GOFILES)
+	mkdir -p "$(@D)"
+	GOOS=linux GOARCH=ppc64le go build \
+	-ldflags '-s -w -X main.version="$(VERSION)"' \
+	-o "$@" \
+	"$(PACKAGE)/cmd/$(NAME)"
 
 build/bin/linux-amd64: $(GOFILES)
 	mkdir -p "$(@D)"
