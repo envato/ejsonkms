@@ -13,7 +13,8 @@ build/bin/linux-ppc64le: $(GOFILES)
 	mkdir -p "$(@D)"
 	GOOS=linux GOARCH=ppc64le go build \
 	-ldflags '-s -w -X main.version="$(VERSION)"' \
-	-o "$@"
+	-o "$@" \
+	"$(PACKAGE)/cmd/$(NAME)"
 
 build/bin/linux-amd64: $(GOFILES)
 	mkdir -p "$(@D)"
