@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 1
+builds:
+  - main: ./cmd/ejsonkms
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip

@@ -12,7 +12,12 @@ Precompiled binaries can be downloaded from [releases](https://github.com/envato
 ### Go
 
 ```
-go get -u github.com/envato/ejsonkms
+go install github.com/envato/ejsonkms/cmd/ejsonkms@latest
+
+# Move binary to somewhere on $PATH. E.g.,
+sudo cp "${GOBIN:-$HOME/go/bin}/ejsonkms" /usr/local/bin/
+
+ejsonkms
 ```
 
 This will install the binary to `$GOBIN/ejsonkms`.
@@ -62,3 +67,16 @@ secret123
 ```
 
 Note that only secrets under the "environment" key will be exported using the `env` command.
+
+## pre-commit hook
+
+A [pre-commit](https://pre-commit.com/) hook is also supported to automatically run `ejsonkms encrypt` on all `.ejson` files in a repository.
+
+To use, add the following to a `.pre-commit-config.yaml` file in your repository:
+
+```yaml
+repos:
+  - repo: https://github.com/envato/ejsonkms
+    hooks:
+      - id: run-ejsonkms-encrypt
+```
