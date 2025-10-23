@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/Shopify/ejson"
-	"github.com/Shopify/ejson2env"
+	"github.com/Shopify/ejson2env/v2"
 )
 
 func EncryptAction(args []string) error {
