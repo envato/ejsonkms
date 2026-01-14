@@ -5,6 +5,17 @@ Service](https://aws.amazon.com/kms/) to simplify deployments on AWS. The EJSON 
 KMS and stored inside the EJSON file as `_private_key_enc`. Access to decrypt secrets can be controlled with IAM
 permissions on the KMS key.
 
+## Supported File Formats
+
+`ejsonkms` supports both JSON and YAML file formats:
+
+| Format | Extensions | Description |
+|--------|------------|-------------|
+| JSON   | `.ejson`   | Standard EJSON format |
+| YAML   | `.eyml`, `.eyaml` | YAML format for better readability |
+
+The file format is automatically detected based on the file extension.
+
 ## Install
 
 Precompiled binaries can be downloaded from [releases](https://github.com/envato/ejsonkms/releases).
@@ -24,7 +35,7 @@ This will install the binary to `$GOBIN/ejsonkms`.
 
 ## Usage
 
-Generating an EJSON file:
+Generating an EJSON file (JSON format):
 
 ```
 $ ejsonkms keygen --aws-region us-east-1 --kms-key-id bc436485-5092-42b8-92a3-0aa8b93536dc -o secrets.ejson
@@ -34,6 +45,16 @@ $ cat secrets.ejson
   "_public_key": "6b8280f86aff5f48773f63d60e655e2f3dd0dd7c14f5fecb5df22936e5a3be52",
   "_private_key_enc": "S2Fybjphd3M6a21zOnVzLWVhc3QtMToxMTExMjIyMjMzMzM6a2V5L2JjNDM2NDg1LTUwOTItNDJiOC05MmEzLTBhYThiOTM1MzZkYwAAAAAycRX5OBx6xGuYOPAmDJ1FombB1lFybMP42s7PGmoa24bAesPMMZtI9V0w0p0lEgLeeSvYdsPuoPROa4bwnQxJB28eC6fHgfWgY7jgDWY9uP/tgzuWL3zuIaq+9Q=="
 }
+```
+
+Generating an EYAML file (YAML format):
+
+```
+$ ejsonkms keygen --aws-region us-east-1 --kms-key-id bc436485-5092-42b8-92a3-0aa8b93536dc -o secrets.eyaml
+Private Key: ae5969d1fb70faab76198ee554bf91d2fffc44d027ea3d804a7c7f92876d518b
+$ cat secrets.eyaml
+_public_key: 6b8280f86aff5f48773f63d60e655e2f3dd0dd7c14f5fecb5df22936e5a3be52
+_private_key_enc: S2Fybjphd3M6a21zOnVzLWVhc3QtMToxMTExMjIyMjMzMzM6a2V5L2JjNDM2NDg1LTUwOTItNDJiOC05MmEzLTBhYThiOTM1MzZkYwAAAAAycRX5OBx6xGuYOPAmDJ1FombB1lFybMP42s7PGmoa24bAesPMMZtI9V0w0p0lEgLeeSvYdsPuoPROa4bwnQxJB28eC6fHgfWgY7jgDWY9uP/tgzuWL3zuIaq+9Q==
 ```
 
 Encrypting:
@@ -70,7 +91,7 @@ Note that only secrets under the "environment" key will be exported using the `e
 
 ## pre-commit hook
 
-A [pre-commit](https://pre-commit.com/) hook is also supported to automatically run `ejsonkms encrypt` on all `.ejson` files in a repository.
+A [pre-commit](https://pre-commit.com/) hook is also supported to automatically run `ejsonkms encrypt` on all `.ejson`, `.eyml`, and `.eyaml` files in a repository.
 
 To use, add the following to a `.pre-commit-config.yaml` file in your repository:
 

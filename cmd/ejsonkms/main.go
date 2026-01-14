@@ -26,7 +26,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "encrypt",
-			Usage: "(re-)encrypt one or more EJSON files",
+			Usage: "(re-)encrypt one or more EJSON|EYAML files",
 			Action: func(c *cli.Context) {
 				if err := ejsonkms.EncryptAction(c.Args()); err != nil {
 					fmt.Fprintln(os.Stderr, "Encryption failed:", err)
@@ -36,7 +36,7 @@ func main() {
 		},
 		{
 			Name:  "decrypt",
-			Usage: "decrypt an EJSON file",
+			Usage: "decrypt an EJSON|EYAML file",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "o",
@@ -56,7 +56,7 @@ func main() {
 		},
 		{
 			Name:  "keygen",
-			Usage: "generate a new EJSON keypair",
+			Usage: "generate a new EJSON|EYAML keypair",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "kms-key-id",

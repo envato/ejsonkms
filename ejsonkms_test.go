@@ -38,7 +38,7 @@ func TestKeygen(t *testing.T) {
 }
 
 func TestDecrypt(t *testing.T) {
-	Convey("Decrypt", t, func() {
+	Convey("Decrypt JSON", t, func() {
 		decrypted, err := Decrypt("testdata/test.ejson", "us-east-1")
 		Convey("should return decrypted values", func() {
 			So(err, ShouldBeNil)
@@ -46,8 +46,23 @@ func TestDecrypt(t *testing.T) {
 			So(json, ShouldContainSubstring, `"my_secret": "secret123"`)
 		})
 	})
-	Convey("Decrypt with no private key", t, func() {
+	Convey("Decrypt JSON with no private key", t, func() {
 		_, err := Decrypt("testdata/test_no_private_key.ejson", "us-east-1")
+		Convey("should fail", func() {
+			So(err, ShouldNotBeNil)
+			So(err.Error(), ShouldContainSubstring, "missing _private_key_enc")
+		})
+	})
+	Convey("Decrypt YAML", t, func() {
+		decrypted, err := Decrypt("testdata/test.eyml", "us-east-1")
+		Convey("should return decrypted values in YAML format", func() {
+			So(err, ShouldBeNil)
+			content := string(decrypted[:])
+			So(content, ShouldContainSubstring, `my_secret: secret123`)
+		})
+	})
+	Convey("Decrypt YAML with no private key", t, func() {
+		_, err := Decrypt("testdata/test_no_private_key.eyml", "us-east-1")
 		Convey("should fail", func() {
 			So(err, ShouldNotBeNil)
 			So(err.Error(), ShouldContainSubstring, "missing _private_key_enc")

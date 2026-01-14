@@ -11,6 +11,7 @@ require (
 	github.com/kami-zh/go-capturer v0.0.0-20171211120116-e492ea43421d
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/urfave/cli v1.22.17
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

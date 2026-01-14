@@ -8,7 +8,7 @@ import (
 )
 
 func TestEnv(t *testing.T) {
-	Convey("Env", t, func() {
+	Convey("Env with JSON", t, func() {
 		out := capturer.CaptureOutput(func() {
 			err := EnvAction("testdata/test.ejson", "us-east-1", false)
 			So(err, ShouldBeNil)
@@ -19,8 +19,28 @@ func TestEnv(t *testing.T) {
 		})
 	})
 
-	Convey("Env with no private key", t, func() {
+	Convey("Env with JSON with no private key", t, func() {
 		err := EnvAction("testdata/test_no_private_key.ejson", "us-east-1", false)
+
+		Convey("should fail", func() {
+			So(err, ShouldNotBeNil)
+			So(err.Error(), ShouldContainSubstring, "missing _private_key_enc")
+		})
+	})
+
+	Convey("Env with YAML", t, func() {
+		out := capturer.CaptureOutput(func() {
+			err := EnvAction("testdata/test.eyml", "us-east-1", false)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("should return decrypted values as shell exports", func() {
+			So(out, ShouldContainSubstring, "export my_secret=secret123")
+		})
+	})
+
+	Convey("Env with YAML with no private key", t, func() {
+		err := EnvAction("testdata/test_no_private_key.eyml", "us-east-1", false)
 
 		Convey("should fail", func() {
 			So(err, ShouldNotBeNil)
