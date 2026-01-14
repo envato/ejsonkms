@@ -43,8 +43,9 @@ func main() {
 					Usage: "print output to the provided file, rather than stdout",
 				},
 				cli.StringFlag{
-					Name:  "aws-region",
-					Usage: "AWS Region",
+					Name:   "aws-region",
+					Usage:  "AWS Region",
+					EnvVar: "AWS_REGION,AWS_DEFAULT_REGION",
 				},
 			},
 			Action: func(c *cli.Context) {
@@ -63,8 +64,9 @@ func main() {
 					Usage: "KMS Key ID to encrypt the private key with",
 				},
 				cli.StringFlag{
-					Name:  "aws-region",
-					Usage: "AWS Region",
+					Name:   "aws-region",
+					Usage:  "AWS Region",
+					EnvVar: "AWS_REGION,AWS_DEFAULT_REGION",
 				},
 				cli.StringFlag{
 					Name:  "o",
@@ -87,8 +89,9 @@ func main() {
 					Usage: "Suppress export statement",
 				},
 				cli.StringFlag{
-					Name:  "aws-region",
-					Usage: "AWS Region",
+					Name:   "aws-region",
+					Usage:  "AWS Region",
+					EnvVar: "AWS_REGION,AWS_DEFAULT_REGION",
 				},
 			},
 			Action: func(c *cli.Context) {
