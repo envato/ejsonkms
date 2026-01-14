@@ -8,6 +8,9 @@ import (
 )
 
 func TestEnv(t *testing.T) {
+	cleanup := setupMockKMS()
+	defer cleanup()
+
 	Convey("Env with JSON", t, func() {
 		out := capturer.CaptureOutput(func() {
 			err := EnvAction("testdata/test.ejson", "us-east-1", false)

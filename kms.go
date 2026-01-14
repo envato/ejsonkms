@@ -11,8 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 )
 
+// kmsClientFactory allows tests to override the KMS client creation
+var kmsClientFactory func(awsRegion string) kmsiface.KMSAPI = newKmsClient
+
 func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
-	kmsSvc := newKmsClient(awsRegion)
+	kmsSvc := kmsClientFactory(awsRegion)
 
 	encryptedValue, err := base64.StdEncoding.DecodeString(privateKeyEnc)
 
@@ -27,7 +30,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 }
 
 func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key string, err error) {
-	kmsSvc := newKmsClient(awsRegion)
+	kmsSvc := kmsClientFactory(awsRegion)
 	params := &kms.EncryptInput{
 		KeyId:     &kmsKeyID,
 		Plaintext: []byte(privateKey),

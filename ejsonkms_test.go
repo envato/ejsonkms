@@ -6,25 +6,10 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-// type mockKMSClient struct {
-// 	kmsiface.KMSAPI
-// }
-
-// func (m *mockKMSClient) Encrypt(input *kms.EncryptInput) (*kms.EncryptOutput, error) {
-// 	output := &kms.EncryptOutput{
-// 		CiphertextBlob: input.Plaintext,
-// 	}
-// 	return output, nil
-// }
-
-// func (m *mockKMSClient) Decrypt(input *kms.DecryptInput) (*kms.DecryptOutput, error) {
-// 	output := &kms.DecryptOutput{
-// 		Plaintext: input.CiphertextBlob,
-// 	}
-// 	return output, nil
-// }
-
 func TestKeygen(t *testing.T) {
+	cleanup := setupMockKMS()
+	defer cleanup()
+
 	Convey("Keygen", t, func() {
 		ejsonKmsKeys, err := Keygen("bc436485-5092-42b8-92a3-0aa8b93536dc", "us-east-1")
 		Convey("should return three strings that look key-like", func() {
@@ -38,6 +23,9 @@ func TestKeygen(t *testing.T) {
 }
 
 func TestDecrypt(t *testing.T) {
+	cleanup := setupMockKMS()
+	defer cleanup()
+
 	Convey("Decrypt JSON", t, func() {
 		decrypted, err := Decrypt("testdata/test.ejson", "us-east-1")
 		Convey("should return decrypted values", func() {
