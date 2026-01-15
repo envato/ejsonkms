@@ -6,4 +6,4 @@
   entry: ejsonkms encrypt
   language: golang
   types: [file]
-  files: '\.ejson$'
+  files: '\.(ejson|eyaml|etoml)$'
