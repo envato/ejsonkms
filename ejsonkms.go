@@ -1,6 +1,7 @@
 package ejsonkms
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -54,26 +55,35 @@ func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
 	return decryptFile(ejsonFilePath, kmsDecryptedPrivateKey)
 }
 
-// decryptFile decrypts the file using ejson.DecryptFile, handling format conversion for YAML files
+// decryptFile decrypts the file using ejson, handling format conversion for YAML files in memory
 func decryptFile(filePath, privateKey string) ([]byte, error) {
 	isYAML := IsYAMLFile(filePath)
 
-	// Determine the file to decrypt (original for JSON, temp file for YAML)
-	decryptPath := filePath
-	if isYAML {
-		tmpFile, err := createTempJSONFile(filePath)
-		if err != nil {
-			return nil, err
-		}
-		defer os.Remove(tmpFile)
-		decryptPath = tmpFile
-	}
-
-	// Both formats use the same decryption path
-	decryptedJSON, err := ejson.DecryptFile(decryptPath, "", privateKey)
+	// Read file contents
+	fileData, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
+
+	// Convert YAML to JSON in memory if needed
+	var jsonData []byte
+	if isYAML {
+		jsonData, err = convertYAMLToJSON(fileData)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		jsonData = fileData
+	}
+
+	// Decrypt using in-memory reader/writer
+	var outBuf bytes.Buffer
+	inBuf := bytes.NewReader(jsonData)
+	if err := ejson.Decrypt(inBuf, &outBuf, "", privateKey); err != nil {
+		return nil, err
+	}
+
+	decryptedJSON := outBuf.Bytes()
 
 	// Convert back to YAML if needed
 	if isYAML {
@@ -83,36 +93,14 @@ func decryptFile(filePath, privateKey string) ([]byte, error) {
 	return decryptedJSON, nil
 }
 
-// createTempJSONFile converts a YAML file to a temporary JSON file for decryption
-func createTempJSONFile(yamlFilePath string) (string, error) {
-	yamlData, err := ioutil.ReadFile(yamlFilePath)
-	if err != nil {
-		return "", err
-	}
-
+// convertYAMLToJSON converts YAML data to JSON in memory
+func convertYAMLToJSON(yamlData []byte) ([]byte, error) {
 	var data interface{}
 	if err := yaml.Unmarshal(yamlData, &data); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return "", err
-	}
-
-	tmpFile, err := ioutil.TempFile("", "ejsonkms-*.ejson")
-	if err != nil {
-		return "", err
-	}
-
-	if _, err := tmpFile.Write(jsonData); err != nil {
-		tmpFile.Close()
-		os.Remove(tmpFile.Name())
-		return "", err
-	}
-	tmpFile.Close()
-
-	return tmpFile.Name(), nil
+	return json.Marshal(data)
 }
 
 // convertJSONToYAML converts decrypted JSON data to YAML format

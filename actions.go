@@ -260,31 +260,33 @@ func EnvAction(ejsonFilePath, awsRegion string, quiet bool) error {
 	if quiet {
 		exportFunc = ejson2env.ExportQuiet
 	}
-	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
+
+	// Decrypt the file in memory (handles both JSON and YAML)
+	decrypted, err := Decrypt(ejsonFilePath, awsRegion)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not decrypt file: %s", err)
 	}
 
-	kmsDecryptedPrivateKey, err := decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion)
-	if err != nil {
-		return err
-	}
-
-	// ejson2env only supports JSON, so convert YAML to temp JSON file if needed
-	readPath := ejsonFilePath
+	// If input was YAML, the decrypted output is YAML - convert to JSON for ejson2env
+	var jsonData []byte
 	if IsYAMLFile(ejsonFilePath) {
-		tmpFile, err := createTempJSONFile(ejsonFilePath)
+		jsonData, err = convertYAMLToJSON(decrypted)
 		if err != nil {
-			return fmt.Errorf("could not convert YAML to JSON: %s", err)
+			return fmt.Errorf("could not convert decrypted YAML to JSON: %s", err)
 		}
-		defer os.Remove(tmpFile)
-		readPath = tmpFile
+	} else {
+		jsonData = decrypted
 	}
 
-	envValues, err := ejson2env.ReadAndExtractEnv(readPath, "", kmsDecryptedPrivateKey)
+	// Parse decrypted JSON into a map for ExtractEnv
+	var secrets map[string]interface{}
+	if err := json.Unmarshal(jsonData, &secrets); err != nil {
+		return fmt.Errorf("could not parse decrypted data: %s", err)
+	}
 
-	if nil != err && !ejson2env.IsEnvError(err) {
-		return fmt.Errorf("could not load environment from file: %s", err)
+	envValues, err := ejson2env.ExtractEnv(secrets)
+	if err != nil && !ejson2env.IsEnvError(err) {
+		return fmt.Errorf("could not extract environment from file: %s", err)
 	}
 
 	exportFunc(os.Stdout, envValues)
