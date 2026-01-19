@@ -42,11 +42,14 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 }
 
 func newKmsClient(awsRegion string) kmsiface.KMSAPI {
-	awsSession := session.Must(session.NewSession())
-	awsSession.Config.WithRegion(awsRegion)
-	fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL")
-	if len(fakeKmsEndpoint) != 0 {
-		return kms.New(awsSession, aws.NewConfig().WithEndpoint(fakeKmsEndpoint))
+	awsConfig := aws.NewConfig()
+	if awsRegion != "" {
+		awsConfig = awsConfig.WithRegion(awsRegion)
 	}
+	fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL")
+	if fakeKmsEndpoint != "" {
+		awsConfig = awsConfig.WithEndpoint(fakeKmsEndpoint)
+	}
+	awsSession := session.Must(session.NewSession(awsConfig))
 	return kms.New(awsSession)
 }
