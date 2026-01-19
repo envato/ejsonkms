@@ -1,6 +1,7 @@
 package ejsonkms
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -93,7 +94,14 @@ func EnvAction(ejsonFilePath, awsRegion string, quiet bool) error {
 	if quiet {
 		exportFunc = ejson2env.ExportQuiet
 	}
-	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
+
+	// Read file once
+	data, err := os.ReadFile(ejsonFilePath)
+	if err != nil {
+		return err
+	}
+
+	privateKeyEnc, err := extractPrivateKeyEnc(data)
 	if err != nil {
 		return err
 	}
@@ -103,9 +111,20 @@ func EnvAction(ejsonFilePath, awsRegion string, quiet bool) error {
 		return err
 	}
 
-	envValues, err := ejson2env.ReadAndExtractEnv(ejsonFilePath, "", kmsDecryptedPrivateKey)
+	// Decrypt using the already-read data
+	var decrypted bytes.Buffer
+	if err := ejson.Decrypt(bytes.NewReader(data), &decrypted, "", kmsDecryptedPrivateKey); err != nil {
+		return err
+	}
 
-	if nil != err && !ejson2env.IsEnvError(err) {
+	// Parse decrypted JSON and extract env values
+	var secrets map[string]interface{}
+	if err := json.Unmarshal(decrypted.Bytes(), &secrets); err != nil {
+		return fmt.Errorf("could not parse decrypted JSON: %s", err)
+	}
+
+	envValues, err := ejson2env.ExtractEnv(secrets)
+	if err != nil && !ejson2env.IsEnvError(err) {
 		return fmt.Errorf("could not load environment from file: %s", err)
 	}
 

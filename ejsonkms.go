@@ -1,9 +1,9 @@
 package ejsonkms
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"os"
 
 	"github.com/Shopify/ejson"
@@ -40,7 +40,12 @@ func Keygen(kmsKeyID, awsRegion string) (EjsonKmsKeys, error) {
 
 // Decrypt decrypts an EJSON file
 func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
-	privateKeyEnc, err := findPrivateKeyEnc(ejsonFilePath)
+	data, err := os.ReadFile(ejsonFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	privateKeyEnc, err := extractPrivateKeyEnc(data)
 	if err != nil {
 		return nil, err
 	}
@@ -50,32 +55,18 @@ func Decrypt(ejsonFilePath, awsRegion string) ([]byte, error) {
 		return nil, err
 	}
 
-	decrypted, err := ejson.DecryptFile(ejsonFilePath, "", kmsDecryptedPrivateKey)
-	if err != nil {
+	var output bytes.Buffer
+	if err := ejson.Decrypt(bytes.NewReader(data), &output, "", kmsDecryptedPrivateKey); err != nil {
 		return nil, err
 	}
 
-	return decrypted, nil
+	return output.Bytes(), nil
 }
 
-func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
-	var (
-		ejsonKmsKeys EjsonKmsKeys
-	)
+func extractPrivateKeyEnc(data []byte) (string, error) {
+	var ejsonKmsKeys EjsonKmsKeys
 
-	file, err := os.Open(ejsonFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		return "", err
-	}
-
-	err = json.Unmarshal(data, &ejsonKmsKeys)
-	if err != nil {
+	if err := json.Unmarshal(data, &ejsonKmsKeys); err != nil {
 		return "", err
 	}
 
@@ -84,4 +75,13 @@ func findPrivateKeyEnc(ejsonFilePath string) (key string, err error) {
 	}
 
 	return ejsonKmsKeys.PrivateKeyEnc, nil
+}
+
+// findPrivateKeyEnc reads a file and extracts the private key
+func findPrivateKeyEnc(ejsonFilePath string) (string, error) {
+	data, err := os.ReadFile(ejsonFilePath)
+	if err != nil {
+		return "", err
+	}
+	return extractPrivateKeyEnc(data)
 }
