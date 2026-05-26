@@ -5,10 +5,6 @@ Service](https://aws.amazon.com/kms/) to simplify deployments on AWS. The EJSON 
 KMS and stored inside the EJSON file as `_private_key_enc`. Access to decrypt secrets can be controlled with IAM
 permissions on the KMS key.
 
-## Ownership
-
-This repository is owned and maintained by the Internal Platform Team. For questions or support, reach out in #gpet-helpline on Slack.
-
 ## Install
 
 Precompiled binaries can be downloaded from [releases](https://github.com/envato/ejsonkms/releases).
