@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-version: 1
+version: 2
 builds:
   - main: ./cmd/ejsonkms
     env:
@@ -18,7 +18,7 @@ builds:
       - goos: windows
         goarch: ppc64le
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
