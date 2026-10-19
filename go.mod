@@ -3,8 +3,8 @@ module github.com/envato/ejsonkms
 go 1.26.6
 
 require (
-	github.com/Shopify/ejson v1.5.5
-	github.com/Shopify/ejson2env/v2 v2.0.8
+	github.com/Shopify/ejson v1.6.0
+	github.com/Shopify/ejson2env/v2 v2.0.9
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/kami-zh/go-capturer v0.0.0-20171211120116-e492ea43421d
 	github.com/smartystreets/goconvey v1.8.1
@@ -20,6 +20,6 @@ require (
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/smarty/assertions v1.16.0 // indirect
-	golang.org/x/crypto v0.57.0 // indirect
-	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
 )
