@@ -1,25 +1,38 @@
 package ejsonkms
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/kms"
-	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/kms"
 )
 
-func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
-	kmsSvc := newKmsClient(awsRegion)
+// kmsAPI is the subset of the KMS client this package calls.
+type kmsAPI interface {
+	Encrypt(ctx context.Context, params *kms.EncryptInput, optFns ...func(*kms.Options)) (*kms.EncryptOutput, error)
+	Decrypt(ctx context.Context, params *kms.DecryptInput, optFns ...func(*kms.Options)) (*kms.DecryptOutput, error)
+}
 
+var kmsClientFactory = newKmsClient
+
+func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
 	encryptedValue, err := base64.StdEncoding.DecodeString(privateKeyEnc)
+	if err != nil {
+		return "", fmt.Errorf("unable to decode encrypted private key: %v", err)
+	}
+
+	ctx := context.Background()
+	kmsSvc, err := kmsClientFactory(ctx, awsRegion)
+	if err != nil {
+		return "", err
+	}
 
 	params := &kms.DecryptInput{
-		CiphertextBlob: []byte(encryptedValue),
+		CiphertextBlob: encryptedValue,
 	}
-	resp, err := kmsSvc.Decrypt(params)
+	resp, err := kmsSvc.Decrypt(ctx, params)
 	if err != nil {
 		return "", fmt.Errorf("unable to decrypt parameter: %v", err)
 	}
@@ -27,12 +40,17 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 }
 
 func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key string, err error) {
-	kmsSvc := newKmsClient(awsRegion)
+	ctx := context.Background()
+	kmsSvc, err := kmsClientFactory(ctx, awsRegion)
+	if err != nil {
+		return "", err
+	}
+
 	params := &kms.EncryptInput{
 		KeyId:     &kmsKeyID,
 		Plaintext: []byte(privateKey),
 	}
-	resp, err := kmsSvc.Encrypt(params)
+	resp, err := kmsSvc.Encrypt(ctx, params)
 	if err != nil {
 		return "", fmt.Errorf("unable to encrypt parameter: %v", err)
 	}
@@ -41,12 +59,13 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 	return encodedPrivKey, nil
 }
 
-func newKmsClient(awsRegion string) kmsiface.KMSAPI {
-	awsSession := session.Must(session.NewSession())
-	awsSession.Config.WithRegion(awsRegion)
-	fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL")
-	if len(fakeKmsEndpoint) != 0 {
-		return kms.New(awsSession, aws.NewConfig().WithEndpoint(fakeKmsEndpoint))
+func newKmsClient(ctx context.Context, awsRegion string) (kmsAPI, error) {
+	// The SDK treats an empty region as unset, so the environment and shared
+	// config still apply when awsRegion is "".
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(awsRegion))
+	if err != nil {
+		return nil, fmt.Errorf("unable to load AWS config: %v", err)
 	}
-	return kms.New(awsSession)
+
+	return kms.NewFromConfig(cfg), nil
 }

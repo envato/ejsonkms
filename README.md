@@ -71,6 +71,19 @@ secret123
 
 Note that only secrets under the "environment" key will be exported using the `env` command.
 
+## Testing
+
+The test suite runs against a local KMS container, so run it through compose:
+
+```
+docker compose run --rm --build tests
+```
+
+The SDK reads its region and endpoint from the standard AWS environment variables and shared config. The
+compose file sets `AWS_ENDPOINT_URL_KMS` to point it at the container; the same variable points an `ejsonkms`
+binary at any other KMS-compatible endpoint. Versions before this one used a custom `FAKE_AWSKMS_URL` variable
+for the same purpose, which is no longer read.
+
 ## pre-commit hook
 
 A [pre-commit](https://pre-commit.com/) hook is also supported to automatically run `ejsonkms encrypt` on all `.ejson` files in a repository.
