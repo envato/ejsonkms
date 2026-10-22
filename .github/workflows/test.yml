@@ -1,0 +1,17 @@
+name: Test
+
+on: push
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run tests against local KMS
+        run: docker compose run --rm --build tests go test -race -coverprofile=coverage.txt -covermode=atomic
+      - name: Stop containers
+        if: always()
+        run: docker compose down --remove-orphans
