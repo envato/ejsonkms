@@ -11,6 +11,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 )
 
+// kmsAPI is the subset of the KMS client this package calls.
+type kmsAPI interface {
+	Encrypt(ctx context.Context, params *kms.EncryptInput, optFns ...func(*kms.Options)) (*kms.EncryptOutput, error)
+	Decrypt(ctx context.Context, params *kms.DecryptInput, optFns ...func(*kms.Options)) (*kms.DecryptOutput, error)
+}
+
+var kmsClientFactory = newKmsClient
+
 func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err error) {
 	encryptedValue, err := base64.StdEncoding.DecodeString(privateKeyEnc)
 	if err != nil {
@@ -18,7 +26,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 	}
 
 	ctx := context.Background()
-	kmsSvc, err := newKmsClient(ctx, awsRegion)
+	kmsSvc, err := kmsClientFactory(ctx, awsRegion)
 	if err != nil {
 		return "", err
 	}
@@ -35,7 +43,7 @@ func decryptPrivateKeyWithKMS(privateKeyEnc, awsRegion string) (key string, err 
 
 func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key string, err error) {
 	ctx := context.Background()
-	kmsSvc, err := newKmsClient(ctx, awsRegion)
+	kmsSvc, err := kmsClientFactory(ctx, awsRegion)
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +61,7 @@ func encryptPrivateKeyWithKMS(privateKey, kmsKeyID, awsRegion string) (key strin
 	return encodedPrivKey, nil
 }
 
-func newKmsClient(ctx context.Context, awsRegion string) (*kms.Client, error) {
+func newKmsClient(ctx context.Context, awsRegion string) (kmsAPI, error) {
 	// The SDK treats an empty region as unset, so the environment and shared
 	// config still apply when awsRegion is "".
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(awsRegion))
