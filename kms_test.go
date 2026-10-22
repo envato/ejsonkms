@@ -3,6 +3,8 @@ package ejsonkms
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -68,11 +70,21 @@ func TestKMSPrivateKeyRoundTrip(t *testing.T) {
 }
 
 func TestNewKmsClient(t *testing.T) {
-	// Loading config does not resolve credentials, so these cases need no
-	// KMS endpoint. Each case pins the environment it depends on.
-	t.Setenv("AWS_REGION", "")
-	t.Setenv("AWS_DEFAULT_REGION", "")
-	t.Setenv("FAKE_AWSKMS_URL", "")
+	// newKmsClient sends no request, so these cases need neither a KMS
+	// endpoint nor credentials. Clear every variable the SDK reads when it
+	// loads config, and point it at a shared config that does not exist, so
+	// the developer's own AWS setup cannot reach the assertions.
+	for _, name := range []string{
+		"AWS_REGION", "AWS_DEFAULT_REGION", "AWS_PROFILE",
+		"AWS_ENDPOINT_URL", "AWS_ENDPOINT_URL_KMS",
+		"AWS_IGNORE_CONFIGURED_ENDPOINT_URLS", "AWS_CA_BUNDLE",
+	} {
+		t.Setenv(name, "")
+		os.Unsetenv(name)
+	}
+	missing := filepath.Join(t.TempDir(), "missing")
+	t.Setenv("AWS_CONFIG_FILE", missing)
+	t.Setenv("AWS_SHARED_CREDENTIALS_FILE", missing)
 
 	options := func(t *testing.T, awsRegion string) kms.Options {
 		t.Helper()
@@ -109,8 +121,8 @@ func TestNewKmsClient(t *testing.T) {
 		}
 	})
 
-	t.Run("FAKE_AWSKMS_URL overrides the endpoint", func(t *testing.T) {
-		t.Setenv("FAKE_AWSKMS_URL", "http://awskms:8080")
+	t.Run("AWS_ENDPOINT_URL_KMS overrides the endpoint", func(t *testing.T) {
+		t.Setenv("AWS_ENDPOINT_URL_KMS", "http://awskms:8080")
 		opts := options(t, "us-east-1")
 		if opts.BaseEndpoint == nil || *opts.BaseEndpoint != "http://awskms:8080" {
 			t.Errorf("BaseEndpoint = %v, want http://awskms:8080", opts.BaseEndpoint)

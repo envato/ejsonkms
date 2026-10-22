@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 )
@@ -69,11 +67,5 @@ func newKmsClient(ctx context.Context, awsRegion string) (kmsAPI, error) {
 		return nil, fmt.Errorf("unable to load AWS config: %v", err)
 	}
 
-	var clientOpts []func(*kms.Options)
-	if fakeKmsEndpoint := os.Getenv("FAKE_AWSKMS_URL"); fakeKmsEndpoint != "" {
-		clientOpts = append(clientOpts, func(o *kms.Options) {
-			o.BaseEndpoint = aws.String(fakeKmsEndpoint)
-		})
-	}
-	return kms.NewFromConfig(cfg, clientOpts...), nil
+	return kms.NewFromConfig(cfg), nil
 }
