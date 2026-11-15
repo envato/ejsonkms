@@ -1,6 +1,6 @@
 module github.com/envato/ejsonkms
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/Shopify/ejson v1.6.0
